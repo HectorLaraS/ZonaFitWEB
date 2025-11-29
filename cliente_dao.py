@@ -1,9 +1,12 @@
 from conexion import Conexion
 from cliente import Cliente
+from mysql.connector import MySQLConnection
+from mysql.connector.cursor import MySQLCursor
 
 
 class ClienteDAO:
     SELECCIONAR = 'SELECT * FROM cliente ORDER BY id'
+    SELECCIONAR_ID = 'SELECT * FROM cliente WHERE id=%s'
     INSERTAR = 'INSERT INTO cliente(nombre, apellido, membresia) VALUES(%s, %s, %s)'
     ACTUALIZAR = 'UPDATE cliente SET nombre=%s, apellido=%s, membresia=%s WHERE id=%s'
     ELIMINAR = 'DELETE FROM cliente WHERE id=%s'
@@ -77,6 +80,27 @@ class ClienteDAO:
             return cursor.rowcount
         except Exception as e:
             print(f'Ocurrio un error al eliminar un cliente: {e}')
+        finally:
+            if conexion is not None:
+                cursor.close()
+                Conexion.liberar_conexion(conexion)
+
+    @classmethod
+    def seleccionar_id(cls, id: int):
+        conexion: MySQLConnection= None
+        cursor: MySQLCursor = None
+        try:
+            conexion = Conexion.obtener_conexion()
+            valores = (id,)
+            cursor = conexion.cursor()
+            cursor.execute(cls.SELECCIONAR_ID, valores)
+            registro = cursor.fetchone()
+            # Mapeo de clase-tabla cliente
+            cliente = Cliente(id=registro[0], nombre=registro[1],
+                                  apellido=registro[2], membresia=registro[3])
+            return cliente
+        except Exception as e:
+            print(f'Ocurrio un error al seleccionar clientes: {e}')
         finally:
             if conexion is not None:
                 cursor.close()

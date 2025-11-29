@@ -6,7 +6,7 @@ class Conexion:
     USERNAME = 'hlaras'
     PASSWORD = 'hlaras.dev'
     DB_PORT = '3306'
-    HOST = '192.168.1.71'
+    HOST = '127.0.0.1'
     POOL_SIZE = 5
     POOL_NAME = 'zona_fit_pool'
     pool = None
